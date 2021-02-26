@@ -31,19 +31,18 @@ public class Conexao implements Runnable {
 					cadastrarUsuario();
 				} else {
 					String inputString = clientInput.readLine();
-					if(!inputString.trim().equals("")) {
+					if (!inputString.trim().equals("")) {
 						if (inputString.toLowerCase().equals("!sair")) {
 							break;
 						} else if (inputString.toLowerCase().equals("!pv")) {
 							enviarMsgPrivada();
-
 						} else if (inputString.trim().toLowerCase().equals("!comandos")) {
 							exibirComandos();
 						} else {
 							enviarParaTodos(this.username + ": " + inputString);
 						}
 					}
-					
+
 				}
 
 			}
@@ -86,7 +85,7 @@ public class Conexao implements Runnable {
 	}
 
 	private void exibirComandos() {
-		this.clientOutput.println("Comandos do Chat:");
+		this.clientOutput.println("\nComandos do Chat:");
 		this.clientOutput.println("!sair - Desconecta do Chat");
 		this.clientOutput.println("!listar - Exibe os usuários conectados");
 		this.clientOutput.println("!pv - Enviar mensagem para um usuário");
@@ -100,22 +99,31 @@ public class Conexao implements Runnable {
 			while (!mensagemEnviada) {
 				String input = null;
 				if (destinatario == null) {
+					this.clientOutput.println("\nDigite !voltar para voltar para o chat.");
 					this.clientOutput.println("Digite o nome do usuário:");
-					input = clientInput.readLine();
-					if (!input.trim().equals("")) {
+					input = clientInput.readLine().trim();
+					if (!input.equals("")) {
+						if (input.toLowerCase().equals("!voltar")) {
+							break;
+						}
 						destinatario = input;
 					}
 				}
 				if (destinatario != null) {
 					boolean userExists = RepositorioUsuarios.getInstance().contains(destinatario);
 					if (userExists) {
+						this.clientOutput.println("\nDigite !voltar para voltar para o menu anterior.");
 						this.clientOutput.println("Digite a mensagem:");
-						String mensagem = clientInput.readLine();
-						if (!mensagem.trim().equals("")) {
-							for (Conexao con : conexoes) {
-								if (con.username.equals(destinatario)) {
-									con.clientOutput.println("PV de " + this.username + ": " + mensagem);
-									mensagemEnviada = true;
+						String mensagem = clientInput.readLine().trim();
+						if (!mensagem.equals("")) {
+							if (mensagem.toLowerCase().equals("!voltar")) {
+								destinatario = null;
+							} else {
+								for (Conexao con : conexoes) {
+									if (con.username.equals(destinatario)) {
+										con.clientOutput.println("PV de " + this.username + ": " + mensagem);
+										mensagemEnviada = true;
+									}
 								}
 							}
 						}
