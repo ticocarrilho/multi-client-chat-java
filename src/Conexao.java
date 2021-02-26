@@ -33,6 +33,7 @@ public class Conexao implements Runnable {
 					String inputString = clientInput.readLine();
 					if (!inputString.trim().equals("")) {
 						if (inputString.toLowerCase().equals("!sair")) {
+							RepositorioUsuarios.getInstance().delete(this.username);
 							break;
 						} else if (inputString.toLowerCase().equals("!pv")) {
 							enviarMsgPrivada();
