@@ -30,11 +30,13 @@ public class Conexao implements Runnable {
 				if (username == null) {
 					cadastrarUsuario();
 				} else {
-					String inputString = clientInput.readLine();
-					if (!inputString.trim().equals("")) {
+					String inputString = clientInput.readLine().trim();
+					if (!inputString.equals("")) {
 						if (inputString.toLowerCase().equals("!sair")) {
 							RepositorioUsuarios.getInstance().delete(this.username);
 							break;
+						} else if(inputString.toLowerCase().equals("!listar")) {
+							listarUsuarios();
 						} else if (inputString.toLowerCase().equals("!pv")) {
 							enviarMsgPrivada();
 						} else if (inputString.trim().toLowerCase().equals("!comandos")) {
@@ -91,6 +93,15 @@ public class Conexao implements Runnable {
 		this.clientOutput.println("!listar - Exibe os usuários conectados");
 		this.clientOutput.println("!pv - Enviar mensagem para um usuário");
 		this.clientOutput.println("!comandos - Exibe os comandos do chat\n");
+	}
+	
+	private void listarUsuarios() {
+		this.clientOutput.println("\nLista de Usuários:");
+		for (Conexao con : conexoes) {
+			if (con.currentSocket != this.currentSocket) {
+				this.clientOutput.println(con.username);
+			}
+		}
 	}
 
 	private void enviarMsgPrivada() {
