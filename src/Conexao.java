@@ -35,7 +35,7 @@ public class Conexao implements Runnable {
 						if (inputString.toLowerCase().equals("!sair")) {
 							RepositorioUsuarios.getInstance().delete(this.username);
 							break;
-						} else if(inputString.toLowerCase().equals("!listar")) {
+						} else if (inputString.toLowerCase().equals("!listar")) {
 							listarUsuarios();
 						} else if (inputString.toLowerCase().equals("!pv")) {
 							enviarMsgPrivada();
@@ -94,58 +94,68 @@ public class Conexao implements Runnable {
 		this.clientOutput.println("!pv - Enviar mensagem para um usuário");
 		this.clientOutput.println("!comandos - Exibe os comandos do chat\n");
 	}
-	
+
 	private void listarUsuarios() {
-		this.clientOutput.println("\nLista de Usuários:");
-		for (Conexao con : conexoes) {
-			if (con.currentSocket != this.currentSocket) {
-				this.clientOutput.println(con.username);
+		if (RepositorioUsuarios.getInstance().getSize() == 1) {
+			this.clientOutput.println("\nNão tem nenhum outro usuário conectado ao servidor.");
+		} else {
+			this.clientOutput.println("\nLista de Usuários:");
+			for (Conexao con : conexoes) {
+				if (con.currentSocket != this.currentSocket) {
+					this.clientOutput.println(con.username);
+				}
 			}
 		}
+
 	}
 
 	private void enviarMsgPrivada() {
 		try {
 			boolean mensagemEnviada = false;
 			String destinatario = null;
-			while (!mensagemEnviada) {
-				String input = null;
-				if (destinatario == null) {
-					this.clientOutput.println("\nDigite !voltar para voltar para o chat.");
-					this.clientOutput.println("Digite o nome do usuário:");
-					input = clientInput.readLine().trim();
-					if (!input.equals("")) {
-						if (input.toLowerCase().equals("!voltar")) {
-							break;
+			if (RepositorioUsuarios.getInstance().getSize() == 1) {
+				this.clientOutput.println("\nNão tem nenhum outro usuário conectado ao servidor.");
+			} else {
+				while (!mensagemEnviada) {
+					String input = null;
+					if (destinatario == null) {
+						this.clientOutput.println("\nDigite !voltar para voltar para o chat.");
+						this.clientOutput.println("Digite o nome do usuário:");
+						input = clientInput.readLine().trim();
+						if (!input.equals("")) {
+							if (input.toLowerCase().equals("!voltar")) {
+								break;
+							}
+							destinatario = input;
 						}
-						destinatario = input;
 					}
-				}
-				if (destinatario != null) {
-					boolean userExists = RepositorioUsuarios.getInstance().contains(destinatario);
-					if (userExists) {
-						this.clientOutput.println("\nDigite !voltar para voltar para o menu anterior.");
-						this.clientOutput.println("Digite a mensagem:");
-						String mensagem = clientInput.readLine().trim();
-						if (!mensagem.equals("")) {
-							if (mensagem.toLowerCase().equals("!voltar")) {
-								destinatario = null;
-							} else {
-								for (Conexao con : conexoes) {
-									if (con.username.equals(destinatario)) {
-										con.clientOutput.println("PV de " + this.username + ": " + mensagem);
-										mensagemEnviada = true;
+					if (destinatario != null) {
+						boolean userExists = RepositorioUsuarios.getInstance().contains(destinatario);
+						if (userExists) {
+							this.clientOutput.println("\nDigite !voltar para voltar para o menu anterior.");
+							this.clientOutput.println("Digite a mensagem:");
+							String mensagem = clientInput.readLine().trim();
+							if (!mensagem.equals("")) {
+								if (mensagem.toLowerCase().equals("!voltar")) {
+									destinatario = null;
+								} else {
+									for (Conexao con : conexoes) {
+										if (con.username.equals(destinatario)) {
+											con.clientOutput.println("PV de " + this.username + ": " + mensagem);
+											mensagemEnviada = true;
+										}
 									}
 								}
 							}
 						}
-					}
-					if (!userExists) {
-						this.clientOutput.println("O usuário " + input + " não está conectado.");
-						destinatario = null;
+						if (!userExists) {
+							this.clientOutput.println("\nO usuário " + input + " não está conectado.");
+							destinatario = null;
+						}
 					}
 				}
 			}
+
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		}

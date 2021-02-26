@@ -26,4 +26,8 @@ public class RepositorioUsuarios {
 	public boolean contains(String username) {
 		return this.usuarios.contains(username);
 	}
+	
+	public int getSize() {
+		return this.usuarios.size();
+	}
 }
